@@ -51,7 +51,9 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
+*~
 Makefile.in
+config.h.in
 aclocal.m4
 autom4te.cache/
 build/
