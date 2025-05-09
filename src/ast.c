@@ -1,11 +1,17 @@
 #include "ast.h"
+#include <config.h>
 
 #include <stdio.h>
-#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
-struct ast *number_node(uint64_t value)
+#if BACKEND_FLOAT32
+struct ast *number_node(float value)
+#elif BACKEND_FLOAT64
+struct ast *number_node(double value)
+#elif BACKEND_FLOAT128
+struct ast *number_node(long double value)
+#endif
 {
     struct ast *n = calloc(1, sizeof(*n));
     n->type = NUMBER;
@@ -90,7 +96,6 @@ static void _describe(struct ast *ast, int span)
 
     switch (ast->type) {
     case NUMBER:
-        printf("Number => %ld\n", ast->value);
         break;
     case VARIABLE:
         printf("Variable => %s\n", ast->name);

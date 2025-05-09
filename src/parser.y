@@ -1,6 +1,7 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include "ast.h"
 
 int yylex(void);
@@ -11,13 +12,23 @@ void yy_scan_string(const char *str);
 static struct ast *root;
 %}
 
+
 %union {
+#include <config.h>
     uint64_t num;
+#if BACKEND_FLOAT32
+    float flt;
+#elif BACKEND_FLOAT64
+    double flt;
+#elif BACKEND_FLOAT128
+    long double flt;
+#endif
     struct str str;
     struct ast *ast;
 }
 
 %token <num> NUMBER_TOK
+%token <flt> FLOAT_TOK
 %token DEF_TOK
 %token <str> VARIABLE_TOK
 %type <ast> expr statement arg_list
@@ -45,6 +56,7 @@ arg_list:
 
 expr:
     NUMBER_TOK                          { $$ = number_node($1); }
+    | FLOAT_TOK                         { $$ = number_node($1); }
     | VARIABLE_TOK                      { $$ = variable_node($1); }
     | expr PLUS_TOK expr                { $$ = operation_node(ADD, $1, $3); }
     | expr MINUS_TOK expr               { $$ = operation_node(SUB, $1, $3); }
