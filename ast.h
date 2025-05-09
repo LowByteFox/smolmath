@@ -10,6 +10,8 @@ enum node_type {
     SUB,
     MUL,
     DIV,
+    EXP,
+    ASSIGN,
     FUNCTION_DEF,
     FUNCTION_CALL,
     FUNCTION_ARG,
@@ -32,6 +34,10 @@ struct ast {
         } operation;
         struct {
             char *name;
+            struct ast *value;
+        } assign;
+        struct {
+            char *name;
             struct ast *expr;
         } fn_def;
         struct {
@@ -49,6 +55,7 @@ struct ast *number_node(uint64_t value);
 struct ast *variable_node(struct str str);
 struct ast *bracket_node(struct ast *expr);
 struct ast *operation_node(enum node_type type, struct ast *left, struct ast *right);
+struct ast *assign_node(struct str str, struct ast *expr);
 struct ast *fn_def_node(struct str str, struct ast *expr);
 struct ast *fn_call_node(struct str str, struct ast *arg);
 struct ast *fn_arg_node(struct ast *list, struct ast *expr);

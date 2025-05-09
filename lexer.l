@@ -9,6 +9,7 @@
 [0-9]+      { yylval.num = atol(yytext); return NUMBER_TOK; }
 [ \t\n]     ;
 [=(),]      return yytext[0];
+"^"         return EXP_TOK;
 "+"         return PLUS_TOK;
 "-"         return MINUS_TOK;
 "*"         return MUL_TOK;

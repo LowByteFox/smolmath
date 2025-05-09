@@ -42,6 +42,16 @@ struct ast *operation_node(enum node_type type, struct ast *left, struct ast *ri
     return n;
 }
 
+struct ast *assign_node(struct str str, struct ast *expr)
+{
+    struct ast *n = calloc(1, sizeof(*n));
+    n->type = ASSIGN;
+    n->assign.name = strndup(str.str, str.len);
+    n->assign.value = expr;
+    
+    return n;
+}
+
 struct ast *fn_def_node(struct str str, struct ast *expr)
 {
     struct ast *n = calloc(1, sizeof(*n));
@@ -117,6 +127,10 @@ static void _describe(struct ast *ast, int span)
         printf("def %s() =>\n", ast->fn_def.name);
         _describe(ast->fn_def.expr, span + 1);
         break;
+    case ASSIGN:
+        printf("%s = =>\n", ast->assign.name);
+        _describe(ast->assign.value, span + 1);
+        break;
     case FUNCTION_CALL:
         printf("call %s() =>\n", ast->fn_call.name);
         if (ast->fn_call.first_arg != NULL)
@@ -127,6 +141,11 @@ static void _describe(struct ast *ast, int span)
         _describe(ast->fn_arg.expr, span + 1);
         if (ast->fn_arg.next_arg != NULL)
             _describe(ast->fn_arg.next_arg, span);
+        break;
+    case EXP:
+        printf("^ =>\n");
+        _describe(ast->operation.left, span + 1);
+        _describe(ast->operation.right, span + 1);
         break;
     }
 }

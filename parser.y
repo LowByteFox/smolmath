@@ -18,12 +18,13 @@ static struct ast *root;
 }
 
 %token <num> NUMBER_TOK
-%token DEF_TOK 
+%token DEF_TOK
 %token <str> VARIABLE_TOK
 %type <ast> expr statement arg_list
 
 %left PLUS_TOK MINUS_TOK
 %left MUL_TOK DIV_TOK
+%left EXP_TOK
 
 %%
 input:
@@ -32,6 +33,7 @@ input:
 
 statement:
     DEF_TOK VARIABLE_TOK '=' expr       { $$ = fn_def_node($2, $4); }
+    | VARIABLE_TOK '=' expr             { $$ = assign_node($1, $3); }
     | expr                              { $$ = $1; }
     ;
 
@@ -48,13 +50,13 @@ expr:
     | expr MINUS_TOK expr               { $$ = operation_node(SUB, $1, $3); }
     | expr MUL_TOK expr                 { $$ = operation_node(MUL, $1, $3); }
     | expr DIV_TOK expr                 { $$ = operation_node(DIV, $1, $3); }
+    | expr EXP_TOK expr                 { $$ = operation_node(EXP, $1, $3); }
     | '(' expr ')'                      { $$ = bracket_node($2); }
     | VARIABLE_TOK '(' arg_list ')'     { $$ = fn_call_node($1, $3); }
     ;
 %%
 
 struct ast *parse(const char *str) {
-    yy_flex_debug = 0;
     yy_scan_string(str);
     yyparse();
     return root;
